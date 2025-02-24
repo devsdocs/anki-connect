@@ -1268,9 +1268,9 @@ Documentation for currently supported actions is split up by category and is ref
     ```
     </details>
 
-#### `guiSelectNote`
+#### `guiSelectCard`
 
-*   Finds the open instance of the *Card Browser* dialog and selects a note given a note identifier.
+*   Finds the open instance of the *Card Browser* dialog and selects a card given a card identifier.
     Returns `true` if the *Card Browser* is open, `false` otherwise.
 
     <details>
@@ -1278,10 +1278,10 @@ Documentation for currently supported actions is split up by category and is ref
 
     ```json
     {
-        "action": "guiSelectNote",
+        "action": "guiSelectCard",
         "version": 6,
         "params": {
-            "note": 1494723142483
+            "card": 1494723142483
         }
     }
     ```

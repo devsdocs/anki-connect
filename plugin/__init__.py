@@ -1810,11 +1810,16 @@ class AnkiConnect:
 
     @util.api()
     def guiSelectNote(self, note):
+        print('guiSelectNote actually selects card IDs and is deprecated; use guiSelectCard')
+        return self.guiSelectCard(note)
+
+    @util.api()
+    def guiSelectCard(self, card):
         (creator, instance) = aqt.dialogs._dialogs['Browser']
         if instance is None:
             return False
         instance.table.clear_selection()
-        instance.table.select_single_card(note)
+        instance.table.select_single_card(card)
         return True
 
     @util.api()
