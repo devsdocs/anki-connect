@@ -141,7 +141,7 @@ def test_multi_request(external_anki):
 
 
 def test_request_with_empty_body_returns_version_banner(external_anki):
-    response = external_anki.send_bytes(b"")
+    response = json.loads(external_anki.send_bytes(b""))
     assert response == {
         "apiVersion": "AnkiConnect v.6"
     }
