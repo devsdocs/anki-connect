@@ -735,10 +735,10 @@ class AnkiConnect:
 
     @util.api()
     def addNote(self, note):
+        self.startEditing()
         ankiNote = self.createNote(note)
 
         collection = self.collection()
-        self.startEditing()
         nCardsAdded = collection.addNote(ankiNote)
         if nCardsAdded < 1:
             raise Exception('The field values you have provided would make an empty question on all cards.')
