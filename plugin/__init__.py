@@ -16,8 +16,16 @@
 import aqt
 
 required_anki_version = (23, 10, 0)
-anki_version = tuple(int(segment) for segment in aqt.appVersion.split("."))
+VERSION_SUFFIXES = ["b", "rc"]
 
+version_string = aqt.appVersion
+for suffix in VERSION_SUFFIXES:
+    version_string = version_string.replace(suffix, ".")
+anki_version = tuple(int(segment) for segment in version_string.split(".") if segment)
+
+# Append to tuple when versions have different number of segments (ie. 25.07 vs 25.07.0)
+anki_version += (0,) * (len(required_anki_version) - len(anki_version))
+required_anki_version += (0,) * (len(anki_version) - len(required_anki_version))
 if anki_version < required_anki_version:
     raise Exception(f"Minimum Anki version supported: {required_anki_version[0]}.{required_anki_version[1]}.{required_anki_version[2]}")
 
