@@ -3544,8 +3544,8 @@ Documentation for currently supported actions is split up by category and is ref
     with the mandatory `filename` field and one of `data`, `path` or `url`. Refer to the documentation of `storeMediaFile` for an explanation of these fields.
     The `skipHash` field can be optionally provided to skip the inclusion of files with an MD5 hash that matches the provided value.
     This is useful for avoiding the saving of error pages and stub files.
-    The `fields` member is a list of fields that should play audio or video, or show a picture when the card is displayed in
-    Anki. The `allowDuplicate` member inside `options` group can be set to true to enable adding duplicate cards.
+    The `fields` member is a list of field names to which the inserted media should be appended to. It can be omitted if this isn't required.
+    The `allowDuplicate` member inside `options` group can be set to true to enable adding duplicate cards.
     Normally duplicate cards can not be added and trigger exception.
 
     The `duplicateScope` member inside `options` can be used to specify the scope for which duplicates are checked.
@@ -3604,9 +3604,6 @@ Documentation for currently supported actions is split up by category and is ref
                     "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/A_black_cat_named_Tilly.jpg/220px-A_black_cat_named_Tilly.jpg",
                     "filename": "black_cat.jpg",
                     "skipHash": "8d6e4646dfae812bf39651b59d7429ce",
-                    "fields": [
-                        "Back"
-                    ]
                 }]
             }
         }

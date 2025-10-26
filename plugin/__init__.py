@@ -776,7 +776,7 @@ class AnkiConnect:
             mediaList = [mediaObjectOrList]
 
         for media in mediaList:
-            if media is not None and len(media['fields']) > 0:
+            if media is not None:
                 try:
                     mediaFilename = self.storeMediaFile(media['filename'],
                                                         data=media.get('data'),
@@ -785,7 +785,7 @@ class AnkiConnect:
                                                         skipHash=media.get('skipHash'),
                                                         deleteExisting=media.get('deleteExisting'))
 
-                    if mediaFilename is not None:
+                    if mediaFilename is not None and hasattr(media, 'fields'):
                         for field in media['fields']:
                             if field in ankiNote:
                                 if mediaType is util.MediaType.Picture:
