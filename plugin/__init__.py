@@ -1982,6 +1982,16 @@ class AnkiConnect:
         reviewer._answerCard(ease)
         return True
 
+    @util.api()
+    def guiPlayAudio(self):
+        if not self.guiReviewActive():
+            return False
+
+        reviewer = self.reviewer()
+
+        reviewer.replayAudio()
+
+        return True
 
     @util.api()
     def guiUndo(self):

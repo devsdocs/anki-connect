@@ -1754,6 +1754,31 @@ Documentation for currently supported actions is split up by category and is ref
     ```
     </details>
 
+#### `guiPlayAudio`
+
+*   Plays any Audio for the current side of the current card; returns `true` if succeeded or `false` otherwise.
+
+    <details>
+    <summary><i>Sample request:</i></summary>
+
+    ```json
+    {
+        "action": "guiPlayAudio",
+        "version": 6
+    }
+    ```
+    </details>
+
+    <details>
+    <summary><i>Sample result:</i></summary>
+
+    ```json
+    {
+        "result": true,
+        "error": null
+    }
+    ```
+    </details>
 ---
 
 ### Media Actions

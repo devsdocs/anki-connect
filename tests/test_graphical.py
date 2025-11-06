@@ -123,6 +123,9 @@ class TestReviewActions:
         reviews_after_undo = ac.cardReviews(deck="test_deck", startID=0)
         assert len(reviews_after_undo) == len(reviews_before)
 
+    def test_guiPlayAudio(self, reviewing_started):
+        assert ac.guiPlayAudio() is True
+
 
 class TestSelectedNotes:
     def test_with_valid_deck_query(self, setup):
