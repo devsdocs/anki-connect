@@ -785,7 +785,7 @@ class AnkiConnect:
                                                         skipHash=media.get('skipHash'),
                                                         deleteExisting=media.get('deleteExisting'))
 
-                    if mediaFilename is not None and hasattr(media, 'fields'):
+                    if mediaFilename is not None and 'fields' in media and type(media['fields']) == list:
                         for field in media['fields']:
                             if field in ankiNote:
                                 if mediaType is util.MediaType.Picture:
