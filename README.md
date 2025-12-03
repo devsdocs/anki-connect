@@ -1412,6 +1412,62 @@ Documentation for currently supported actions is split up by category and is ref
     ```
     </details>
 
+#### `guiAddNoteSetData`
+
+*   Sets fields, tags, deck, and note type (model) in the *Add Note* dialog. Optionally appends to fields/tags instead of replacing them.
+    - If the Add Note dialog is not open, returns an error.
+    - Setting deck/model always replaces the current value.
+    - Setting fields/tags appends if `append` is true, otherwise replaces.
+    - Also supports importing media (images/audio) via the note object.
+
+    <details>
+    <summary><i>Sample request (replace):</i></summary>
+
+    ```json
+    {
+        "action": "guiAddNoteSetData",
+        "version": 6,
+        "params": {
+            "note": {
+                "deckName": "Default",
+                "modelName": "Basic",
+                "fields": {"Front": "Hello", "Back": "World"},
+                "tags": ["new", "api"]
+            }
+        }
+    }
+    ```
+    </details>
+
+    <details>
+    <summary><i>Sample request (append):</i></summary>
+
+    ```json
+    {
+        "action": "guiAddNoteSetData",
+        "version": 6,
+        "params": {
+            "note": {
+                "fields": {"Front": " more text"},
+                "tags": ["extra"]
+            },
+            "append": true
+        }
+    }
+    ```
+    </details>
+
+    <details>
+    <summary><i>Sample result:</i></summary>
+
+    ```json
+    {
+        "result": true,
+        "error": null
+    }
+    ```
+    </details>
+
 #### `guiCurrentCard`
 
 *   Returns information about the current card or `null` if not in review mode.

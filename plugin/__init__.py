@@ -1838,6 +1838,55 @@ class AnkiConnect:
         return instance.selectedNotes()
 
     @util.api()
+    def guiAddNoteSetData(self, note, append=False):
+        """
+        Sets fields and media in the Add Note dialog if it is open, using a Note dict.
+        Returns True if successful, or an error dict if not.
+        """
+        addCards = aqt.dialogs._dialogs.get('AddCards', [None, None])[1]
+        if addCards is None or not hasattr(addCards, 'editor'):
+            return {
+                'error': 'Add Note dialog is not open',
+                'code': 1
+            }
+        collection = self.collection()
+        # Set deck
+        if 'deckName' in note:
+            deck = collection.decks.by_name(note['deckName'])
+            if deck is None:
+                raise Exception(f'Deck "{note['deckName']}" not found')
+            addCards.set_deck(deck['id'])
+        # Set model/note type
+        if 'modelName' in note:
+            model = collection.models.by_name(note['modelName'])
+            if model is None:
+                raise Exception(f'Model "{note['modelName']}" not found')
+            addCards.set_note_type(model['id'])
+        
+        editorNote = addCards.editor.note
+        # Set fields
+        if 'fields' in note:
+            for name, value in note['fields'].items():
+                if name not in editorNote:
+                    raise Exception(f'Field "{name}" not found in current note')
+                if append:
+                    editorNote[name] = str(editorNote[name]) + str(value)
+                else:
+                    editorNote[name] = value
+        # Set tags
+        if 'tags' in note:
+            if append:
+                # Ensure tags are a list
+                new_tags = note['tags'] if isinstance(note['tags'], list) else [note['tags']]
+                editorNote.tags = list(set(editorNote.tags + new_tags))
+            else:
+                editorNote.tags = note['tags']
+        # Import media
+        self.addMediaFromNote(editorNote, note)
+        addCards.editor.loadNote()
+        return True
+
+    @util.api()
     def guiAddCards(self, note=None):
         if note is not None:
             collection = self.collection()
