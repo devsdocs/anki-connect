@@ -92,9 +92,13 @@ def setting(key):
                 return [x.strip() for x in val.split(',')]
             return val
         # Fallback to config.json or default
-        return aqt.mw.addonManager.getConfig(__name__).get(key, DEFAULT_CONFIG[key])
-    except:
-        raise Exception('setting {} not found'.format(key))
+        addon_name = __name__.split('.')[0] if '.' in __name__ else __name__
+        config = aqt.mw.addonManager.getConfig(addon_name)
+        if config is None:
+            config = {}
+        return config.get(key, DEFAULT_CONFIG[key])
+    except Exception as e:
+        raise Exception('setting {} not found: {}'.format(key, str(e)))
 
 
 # see https://github.com/FooSoft/anki-connect/issues/308
