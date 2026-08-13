@@ -63,6 +63,10 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           name: Release v${{ env.VERSION }}
+          body: |
+            ## Important Setup Instructions
+            1. **Check your Config:** Please ensure you review your Anki config after installing this add-on.
+            2. **Obsidian Plugin Users:** If you are connecting from the Obsidian Anki Embed plugin, please ensure you enter the correct port (`8766`) on the Anki Embed plugin settings page to successfully connect to this custom fork.
           files: custom_anki_connect.ankiaddon
           fail_on_unmatched_files: true
         env:
