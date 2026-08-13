@@ -25,6 +25,16 @@ jobs:
       - name: Create ankiaddon package
         run: |
           cd plugin
+          cat <<EOF > config.json
+          {
+              "apiKey": null,
+              "apiLogPath": null,
+              "webBindAddress": "127.0.0.1",
+              "webBindPort": 8766,
+              "webCorsOriginList": ["http://localhost"],
+              "ignoreOriginList": []
+          }
+          EOF
           zip -r ../custom_anki_connect.ankiaddon ./*
           cd ..
 
