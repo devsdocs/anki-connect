@@ -82,6 +82,16 @@ DEFAULT_CONFIG = {
 
 def setting(key):
     try:
+        # Check environment variables first (e.g. ANKICONNECT_APIKEY, ANKICONNECT_WEBBINDADDRESS)
+        env_key = 'ANKICONNECT_' + key.upper()
+        if env_key in os.environ:
+            val = os.environ[env_key]
+            if key == 'webBindPort':
+                return int(val)
+            if key in ('webCorsOriginList', 'ignoreOriginList'):
+                return [x.strip() for x in val.split(',')]
+            return val
+        # Fallback to config.json or default
         return aqt.mw.addonManager.getConfig(__name__).get(key, DEFAULT_CONFIG[key])
     except:
         raise Exception('setting {} not found'.format(key))
