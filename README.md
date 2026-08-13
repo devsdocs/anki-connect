@@ -10,7 +10,7 @@ The installation process is similar to other Anki plugins and can be accomplishe
 2.  Input [2055492159](https://ankiweb.net/shared/info/2055492159) into the text box labeled `Code` and press the `OK` button to proceed.
 3.  Restart Anki when prompted to do so in order to complete the installation of Anki-Connect.
 
-Anki must be kept running in the background in order for other applications to be able to use Anki-Connect. You can verify that Anki-Connect is running at any time by accessing `localhost:8765` in your browser. If the server is running, you will see the message `Anki-Connect` displayed in your browser window.
+Anki must be kept running in the background in order for other applications to be able to use Anki-Connect. You can verify that Anki-Connect is running at any time by accessing `localhost:8766` in your browser. If the server is running, you will see the message `Anki-Connect` displayed in your browser window.
 
 ### Notes for Windows Users
 
@@ -31,7 +31,7 @@ Starting with [Mac OS X Mavericks](https://en.wikipedia.org/wiki/OS_X_Mavericks)
 
 ## Application Interface for Developers
 
-Anki-Connect exposes internal Anki features to external applications via an easy to use API. After being installed, this plugin will start an HTTP server on port 8765 whenever Anki is launched. Other applications (including browser extensions) can then communicate with it via HTTP requests.
+Anki-Connect exposes internal Anki features to external applications via an easy to use API. After being installed, this plugin will start an HTTP server on port 8766 whenever Anki is launched. Other applications (including browser extensions) can then communicate with it via HTTP requests.
 
 By default, Anki-Connect will only bind the HTTP server to the `127.0.0.1` IP address, so that you will only be able to access it from the same host on which it is running. If you need to access it over a network, you can change the binding address in the configuration. Go to Tools->Add-ons->AnkiConnect->Config and change the "webBindAddress" value. For example, you can set it to `0.0.0.0` in order to bind it to all network interfaces on your host. This also requires a restart for Anki.
 
@@ -66,13 +66,13 @@ included below as reference.
 #### Curl
 
 ```bash
-curl localhost:8765 -X POST -d '{"action": "deckNames", "version": 6}'
+curl localhost:8766 -X POST -d '{"action": "deckNames", "version": 6}'
 ```
 
 #### Powershell
 
 ```powershell
-(Invoke-RestMethod -Uri http://localhost:8765 -Method Post -Body '{"action": "deckNames", "version": 6}').result
+(Invoke-RestMethod -Uri http://localhost:8766 -Method Post -Body '{"action": "deckNames", "version": 6}').result
 ```
 
 #### Python
@@ -86,7 +86,7 @@ def request(action, **params):
 
 def invoke(action, **params):
     requestJson = json.dumps(request(action, **params)).encode('utf-8')
-    response = json.load(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8765', requestJson)))
+    response = json.load(urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8766', requestJson)))
     if len(response) != 2:
         raise Exception('response has an unexpected number of fields')
     if 'error' not in response:
@@ -130,7 +130,7 @@ function invoke(action, version, params={}) {
             }
         });
 
-        xhr.open('POST', 'http://127.0.0.1:8765');
+        xhr.open('POST', 'http://127.0.0.1:8766');
         xhr.send(JSON.stringify({action, version, params}));
     });
 }
