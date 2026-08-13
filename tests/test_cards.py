@@ -91,3 +91,15 @@ class TestAnswerCards:
         ac.scheduler().reset()
         result = ac.answerCards([{"cardId": 123, "ease": 2}])
         assert result == [False]
+
+    def test_answerCards_with_time(self, setup):
+        ac.scheduler().reset()
+        # Answer with 15 seconds (15000 ms)
+        result = ac.answerCards([{"cardId": setup.card_ids[0], "ease": 3, "time": 15000}])
+        assert result == [True]
+        
+        # Verify the time was recorded (revlog table holds time in milliseconds)
+        # Note: Depending on Anki version, we might need to check cardReviews
+        reviews = ac.cardReviews("test_deck", 0)
+        # The latest review should have a time close to 15000
+        assert reviews[-1]['time'] >= 14000

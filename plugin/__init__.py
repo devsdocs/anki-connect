@@ -1624,8 +1624,12 @@ class AnkiConnect:
             try:
                 cid = answer['cardId']
                 ease = answer['ease']
+                time_spent = answer.get('time', None)
                 card = self.getCard(cid)
                 card.start_timer()
+                if time_spent is not None:
+                    import time
+                    card.timer_started = time.time() - (time_spent / 1000.0)
                 scheduler.answerCard(card, ease)
                 success.append(True)
             except NotFoundError:
