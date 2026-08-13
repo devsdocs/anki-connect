@@ -35,6 +35,26 @@ jobs:
               "ignoreOriginList": []
           }
           EOF
+          cat <<EOF > config.md
+# Custom AnkiConnect Fork
+
+This is a heavily modified fork of AnkiConnect designed specifically to support features like **Time Tracking** for external plugins (like the Obsidian Anki Embed plugin).
+
+## ⚙️ Configuration
+By default, this custom version runs on **Port 8766** (instead of the standard 8765). This is intentional so that it **does not interfere** with the official AnkiConnect if you have both installed.
+
+If you are trying to connect an external app to this plugin, ensure it is pointed to \`http://127.0.0.1:8766\`.
+
+## 🐛 Troubleshooting
+If you encounter a \`502 Bad Gateway\` or connection error:
+1. Ensure Anki is open and running.
+2. Check that no other application is using port 8766.
+3. Verify that your API Key in the config matches your client application.
+
+## 📞 Support & Contact
+If you encounter any issues or bugs with this custom fork, please do **not** report them to the official AnkiConnect repository. 
+Instead, reach out or open an issue at: [https://github.com/devsdocs/anki-connect](https://github.com/devsdocs/anki-connect)
+EOF
           zip -r ../custom_anki_connect.ankiaddon ./*
           cd ..
 
