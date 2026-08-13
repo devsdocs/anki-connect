@@ -67,8 +67,8 @@ def cardAnswer(card):
 
 
 DEFAULT_CONFIG = {
-    'apiKey': None,
-    'apiLogPath': None,
+    'apiKey': os.getenv('ANKICONNECT_APIKEY', None),
+    'apiLogPath': os.getenv('ANKICONNECT_APILOGPATH', None),
     'apiPollInterval': 25,
     'apiVersion': 6,
     'webBacklog': 5,
