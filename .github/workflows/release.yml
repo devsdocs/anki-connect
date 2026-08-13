@@ -1,0 +1,39 @@
+name: Release Custom AnkiConnect Addon
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'plugin/manifest.json'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Get version from manifest
+        id: get_version
+        run: |
+          VERSION=$(jq -r .version plugin/manifest.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Found version: $VERSION"
+
+      - name: Create ankiaddon package
+        run: |
+          cd plugin
+          zip -r ../custom_anki_connect.ankiaddon ./*
+          cd ..
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          files: custom_anki_connect.ankiaddon
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
