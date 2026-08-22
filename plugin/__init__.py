@@ -38,6 +38,7 @@ import os
 import os.path
 import platform
 import re
+import threading
 import time
 import unicodedata
 
@@ -66,6 +67,7 @@ class AnkiConnect:
     def __init__(self):
         self.log = None
         self.timer = None
+        self._sync_lock = threading.Lock()
         self.server = web.WebServer(self.handler)
 
     def initLogging(self):
@@ -500,15 +502,108 @@ class AnkiConnect:
 
     @util.api()
     def sync(self):
-        mw = self.window()
-        auth = mw.pm.sync_auth()
-        if not auth:
-            raise Exception("sync: auth not configured")
-        out = mw.col.sync_collection(auth, mw.pm.media_syncing_enabled())
-        accepted_sync_statuses = [out.NO_CHANGES, out.NORMAL_SYNC]
-        if out.required not in accepted_sync_statuses:
-            raise Exception(f"Sync status {out.required} not one of {accepted_sync_statuses} - see SyncCollectionResponse.ChangesRequired for list of sync statuses: https://github.com/ankitects/anki/blob/e41c4573d789afe8b020fab5d9d1eede50c3fa3d/proto/anki/sync.proto#L57-L65")
-        mw.onSync()
+        if not self._sync_lock.acquire(blocking=False):
+            raise Exception("sync: another sync operation is currently in progress")
+
+        try:
+            mw = self.window()
+            if getattr(mw, "media_syncer", None) and mw.media_syncer.is_syncing():
+                raise Exception("sync: media sync is currently in progress")
+
+            auth = mw.pm.sync_auth()
+            if not auth:
+                raise Exception("sync: auth not configured")
+
+            if hasattr(mw.col, "save"):
+                try:
+                    mw.col.save()
+                except Exception:
+                    pass
+
+            try:
+                import aqt.gui_hooks as gui_hooks
+                if hasattr(gui_hooks, "sync_will_start"):
+                    gui_hooks.sync_will_start()
+            except Exception:
+                pass
+
+            try:
+                out = mw.col.sync_collection(auth, mw.pm.media_syncing_enabled())
+            except Exception as err:
+                if hasattr(anki.errors, "SyncError") and isinstance(err, anki.errors.SyncError):
+                    if getattr(err, "kind", None) is getattr(anki.errors.SyncErrorKind, "AUTH", None):
+                        mw.pm.clear_sync_auth()
+                        raise Exception(f"sync: authentication failed ({err})")
+                    raise Exception(f"sync: AnkiWeb sync error ({err})")
+                elif hasattr(anki.errors, "NetworkError") and isinstance(err, anki.errors.NetworkError):
+                    raise Exception(f"sync: network error ({err})")
+                elif hasattr(anki.errors, "Interrupted") and isinstance(err, anki.errors.Interrupted):
+                    raise Exception("sync: operation was interrupted")
+                else:
+                    raise Exception(f"sync: {err}")
+
+            accepted_sync_statuses = [out.NO_CHANGES, out.NORMAL_SYNC]
+            if out.required not in accepted_sync_statuses:
+                if out.required in (getattr(out, "FULL_SYNC", 2), getattr(out, "FULL_DOWNLOAD", 3), getattr(out, "FULL_UPLOAD", 4)):
+                    raise Exception(f"sync: full sync required (status {out.required}) - a one-way sync must be performed in Anki")
+                raise Exception(f"sync: status {out.required} not accepted")
+
+            if hasattr(out, "host_number") and out.host_number:
+                try:
+                    mw.pm.set_host_number(out.host_number)
+                except Exception:
+                    pass
+            if hasattr(out, "new_endpoint") and out.new_endpoint:
+                try:
+                    mw.pm.set_current_sync_url(out.new_endpoint)
+                except Exception:
+                    pass
+
+            if hasattr(mw.col, "_load_scheduler"):
+                try:
+                    mw.col._load_scheduler()
+                except Exception:
+                    pass
+            if hasattr(mw.col, "models") and hasattr(mw.col.models, "_clear_cache"):
+                try:
+                    mw.col.models._clear_cache()
+                except Exception:
+                    pass
+
+            try:
+                import aqt.gui_hooks as gui_hooks
+                if hasattr(gui_hooks, "sync_did_finish"):
+                    gui_hooks.sync_did_finish()
+            except Exception:
+                pass
+
+            if hasattr(mw, "reset"):
+                try:
+                    mw.reset()
+                except Exception:
+                    pass
+            if hasattr(mw, "toolbar") and hasattr(mw.toolbar, "redraw"):
+                try:
+                    mw.toolbar.redraw()
+                except Exception:
+                    pass
+            if hasattr(mw, "flags") and hasattr(mw.flags, "require_refresh"):
+                try:
+                    mw.flags.require_refresh()
+                except Exception:
+                    pass
+
+            if mw.pm.media_syncing_enabled() and getattr(mw, "media_syncer", None) is not None:
+                try:
+                    if hasattr(mw.media_syncer, "start_monitoring"):
+                        mw.media_syncer.start_monitoring()
+                    elif hasattr(mw.media_syncer, "start"):
+                        mw.media_syncer.start()
+                except Exception:
+                    pass
+
+        finally:
+            self._sync_lock.release()
 
 
     @util.api()

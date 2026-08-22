@@ -6,6 +6,13 @@ on:
       - master
     paths:
       - 'plugin/manifest.json'
+  workflow_dispatch:
+    inputs:
+      patch_notes:
+        description: 'Patch Notes / Release Notes (Markdown)'
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-and-release:
@@ -21,6 +28,21 @@ jobs:
           VERSION=$(jq -r .version plugin/manifest.json)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Found version: $VERSION"
+
+      - name: Prepare Release Notes
+        id: release_notes
+        run: |
+          if [ -n "${{ github.event.inputs.patch_notes }}" ]; then
+            echo "NOTES<<EOF" >> $GITHUB_ENV
+            echo "${{ github.event.inputs.patch_notes }}" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          elif [ -f "scratch/patch.md" ]; then
+            echo "NOTES<<EOF" >> $GITHUB_ENV
+            cat scratch/patch.md >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "NOTES=" >> $GITHUB_ENV
+          fi
 
       - name: Create ankiaddon package
         run: |
@@ -64,6 +86,9 @@ jobs:
           tag_name: v${{ env.VERSION }}
           name: Release v${{ env.VERSION }}
           body: |
+            ${{ env.NOTES }}
+
+            ---
             ## Important Setup Instructions
             1. **Check your Config:** Please ensure you review your Anki config after installing this add-on.
             2. **Obsidian Plugin Users:** If you are connecting from the Obsidian Anki Embed plugin, please ensure you enter the correct port (`8766`) on the Anki Embed plugin settings page to successfully connect to this custom fork.

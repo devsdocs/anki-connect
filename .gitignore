@@ -4,4 +4,5 @@ meta.json
 .idea/
 .tox/
 .vscode/
-scratch/
+scratch/*
+!scratch/patch.md
